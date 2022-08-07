@@ -18,6 +18,7 @@ class IntSection {
     bool add_flag_;
 public:
     IntSection(const std::string& name);
+    IntSection(const std::string& name, const std::vector<int>& vec);
     void add(int object);
     std::vector<int>& get_objects();
     //void add(int object);
@@ -34,6 +35,7 @@ class StringSection {
     bool add_flag_;
 public:
     StringSection(const std::string& name);
+    StringSection(const std::string& name, const std::vector<std::string>& vec);
     void add(const std::string& object);
     std::vector<std::string>& get_objects();
     //void add(int object);

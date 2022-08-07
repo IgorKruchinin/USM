@@ -7,14 +7,69 @@
 #include <map>
 #include <vector>
 
-
 #include "macro_config.h"
+#include "config.h"
+
 #include "Object.h"
 #include "Section.h"
 
 #include <iostream>
 
 #define USMVer() USM_VERSION
+
+struct Stringlist {
+    char c;
+    Stringlist* next;
+    Stringlist (const char cc) {
+        c = cc;
+        next = NULL;
+    }
+    void operator= (const char cc) {
+        c = cc;
+    }
+    void add (const char cc) {
+        Stringlist *sl = this;
+        while (sl->next) {
+            sl = sl->next;
+        }
+        sl->next = new Stringlist(cc);
+    }
+    const std::string to_string(size_t beg, size_t end) {
+        std::string str;
+        Stringlist *sl = this;
+        size_t counter = 0;
+        while(sl && counter < end) {
+            if (counter >= beg) {
+                str += sl->c;
+            }
+            sl = sl->next;
+            ++counter;
+        }
+        return str;
+    }
+    bool operator== (const char cc) {
+        return c == cc;
+    }
+    bool operator== (const std::string& str) {
+        Stringlist* sl = this;
+        bool flag = true;
+        //std::cout << str.size();
+        for (int i = 0; i < str.size(); ++i) {
+            //std::cout << i;
+            if (*sl == str[i]) {
+                if (sl->next == NULL) {
+                    std::cout << "String index out of range";
+                    return 0;
+                }
+            } else {
+                flag = false;
+                //return 0;
+            }
+            sl = sl->next;
+        }
+        return flag;
+    }
+};
 
 class ProfileStorage {
     std::string name_;
@@ -26,86 +81,111 @@ public:
         : name_(name) {
         //file_.open("profiles/" + name_, std::fstream::in | std::fstream::out | std::fstream::app);
         system((std::string(MAKEDIR) + " profiles/res/" + name_).c_str());
-        /*std::string buf;
-        std::cout << file_.is_open();
-        if (file_.is_open()) {
-            std::cout << '1';
-            while (std::getline(file_, buf)) {
-                std::cout << buf << '|';
+        std::ifstream file("profiles/" + name_ + ".uto");
+        std::string buf;
+        //std::cout << file.is_open();
+        if (file.is_open()) {
+            //std::cout << '1';
+            while (std::getline(file, buf)) {
+                //std::cout << buf << '|';
                 std::string sec_name;
                 std::string object;
-                std::vector<Object> objects;
                 bool first_in = true;
                 bool first_out = true;
                 bool continue_reading = false;
-                bool is_int = false;
-                bool is_str = false;
+                int type = 0; //0 is string, 1 is int
                 bool delim_opened = false;
                 bool object_opened = true;
                 bool name_entered = false;
+                int cnt = 0;
+                std::vector<int> ivec;
+                std::vector<std::string> svec;
+                std::string four_char;
+                std::string obj_buff;
+                short four_counter = 0;
+                bool first_after_init_flag = true;
+                Stringlist strlst('1');
+                Stringlist* sl = &strlst;
                 for (const auto &s: buf) {
-                    std::cout << s;
+                    //std::cout << s;
+                    if (first_in && s == 'i') {
+                        type = 1;
+                    } else if (first_in && s == 's') {
+                        type = 0;
+                    }
                     if (s == '<' && first_in)
                         first_in = false;
                     else if (!first_in && !name_entered && s != '>') {
                         sec_name += s;
-                        std::cout << sec_name;
+                        //std::cout << sec_name;
                     } else if (s == '>' && !first_in && !name_entered) {
                         name_entered = true;
                         continue_reading = true;
                         continue;
                     }
                     if (continue_reading) {
-                        if (s == '<') {
-                            delim_opened = true;
-                            continue;
-                        }
-                        if (delim_opened) {
-                            if (s == 'i')
-                                is_int = true;
-                            else if (s == 's')
-                                is_str = true;
-                            else if (s == '>')
-                                delim_opened = false;
-                            else if (s == 'e') {
-                                object_opened = false;
-                                if (is_int)
-                                    objects.emplace_back(object);
-                                else if (is_str)
-                                    objects.emplace_back(object);
+                        if (cnt < 4) {
+                            sl->add(s);
+                            if (first_after_init_flag) {
+                                sl = sl->next;
+                                first_after_init_flag = false;
                             }
-                        } else if (!delim_opened && (is_str || is_int))
-                            object_opened = true;
-                        else if (object_opened && s != '<' && !delim_opened)
-                            object += s;
-                    } else if (first_in && s != '<')
-                        throw "SyntaxError";
+                        } else {
+                            sl->add(s);
+                            if (!(sl->to_string(1, 5) == "<\\e>")) {
+                                obj_buff += sl->c;
+                            } else {
+                                std::cout << obj_buff << '\n';
+                                switch (type) {
+                                    case 0:
+                                        svec.emplace_back(obj_buff);
+                                        break;
+                                    case 1:
+                                        ivec.emplace_back(std::stoi(obj_buff));
+                                        break;
+                                }
+                                obj_buff.clear();
+                                sl = &strlst;
+                                sl = sl->next;
+                            }
+                            //std::cout << sl->to_string(1, 5) << " ";
+                            sl = sl->next;
+                        }
+                        ++cnt;
+                    }
                 }
-                sections_.emplace(sec_name, Section(objects));
+                switch (type) {
+                    case 0:
+                        ssecs_.emplace(sec_name, StringSection(sec_name, svec));
+                        break;
+                    case 1:
+                        isecs_.emplace(sec_name, IntSection(sec_name, ivec));
+                        break;
+                }
                 //file_.seekg();
                 //file_.clear();
                 //file_.seekg(0);
             }
         } else {
             throw "Cannot open file";
-        }*/
+        }
     }
 
 
     void to_file() {
-        if (IN_TEXT_MODE) {
+        if (USM_CONFIG::InTextMode) {
             std::string text_buf;
             for (auto &s: isecs_) {
                 text_buf += "i<" + s.first + ">";
                 for (auto &obj: s.second.get_objects()) {
-                    text_buf += std::to_string(obj) + "<\\e>";
+                    text_buf += std::to_string(obj) + "|<\\e>";
                 }
                 text_buf += "\n";
             }
             for (auto &s: ssecs_) {
                 text_buf += "s<" + s.first + ">";
                 for (auto &obj: s.second.get_objects()) {
-                    text_buf += obj + "<\\e>";
+                    text_buf += obj + "|<\\e>";
                 }
             }
             std::ofstream file("profiles/" + name_ + ".uto");

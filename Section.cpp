@@ -11,6 +11,13 @@ IntSection::IntSection(const std::string& name)
 StringSection::StringSection(const std::string& name)
         : name_(name) {}
 
+StringSection::StringSection(const std::string& name, const std::vector<std::string>& vec)
+    :name_(name), objects_(vec) {}
+
+IntSection::IntSection(const std::string& name, const std::vector<int>& vec)
+        :name_(name), objects_(vec) {}
+
+
 void StringSection::add(const std::string& object) {
     objects_.emplace_back(object);
 }
