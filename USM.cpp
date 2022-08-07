@@ -47,6 +47,13 @@ struct Stringlist {
         }
         return str;
     }
+    Stringlist* end() {
+        Stringlist* sl = this;
+        while(sl->next) {
+            sl = sl->next;
+        }
+        return sl;
+    }
     bool operator== (const char cc) {
         return c == cc;
     }
@@ -145,11 +152,16 @@ public:
                                         break;
                                 }
                                 obj_buff.clear();
-                                sl = &strlst;
-                                sl = sl->next;
+                                sl = sl->end();
+                                cnt = 0;
+                                first_after_init_flag = true;
+                                continue;
                             }
                             //std::cout << sl->to_string(1, 5) << " ";
+                            //sl = &strlst;
                             sl = sl->next;
+                            //cnt = 0;
+                            //first_after_init_flag = true;
                         }
                         ++cnt;
                     }
