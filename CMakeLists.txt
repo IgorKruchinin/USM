@@ -3,4 +3,15 @@ project(USM)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(USM USM.cpp macro_config.h Object.cpp Object.h Section.cpp Section.h)
+
+#find_package(Boost 1.55.0 COMPONENTS system filesystem serialization REQUIRED)
+
+
+add_executable(USM USM.cpp macro_config.h Object.h Section.cpp Section.h test.cpp)
+
+#include_directories(${Boost_INCLUDE_DIRS})
+
+
+
+#target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES})
+

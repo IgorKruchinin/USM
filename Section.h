@@ -9,16 +9,37 @@
 #include <string>
 
 
-class Section {
+
+class IntSection {
     std::string name_;
     //std::string::iterator it;
     //std::string line;
-    std::vector<Object> objects_;
+    std::vector<int> objects_;
+    bool add_flag_;
 public:
-    Section(const std::string& name);
-    void add(const std::string& object);
+    IntSection(const std::string& name);
     void add(int object);
-    operator std::string() const;
+    std::vector<int>& get_objects();
+    //void add(int object);
+    size_t size();
+    const int operator[] (size_t index);
+    //auto operator[] (int index) -> decltype(objects_[index].get_type());
+};
+
+class StringSection {
+    std::string name_;
+    //std::string::iterator it;
+    //std::string line;
+    std::vector<std::string> objects_;
+    bool add_flag_;
+public:
+    StringSection(const std::string& name);
+    void add(const std::string& object);
+    std::vector<std::string>& get_objects();
+    //void add(int object);
+    size_t size();
+    //auto operator[] (int index) -> decltype(objects_[index].get_type());
+    const std::string& operator[] (size_t index);
 };
 
 
