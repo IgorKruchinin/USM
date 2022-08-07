@@ -135,7 +135,7 @@ public:
                             if (!(sl->to_string(1, 5) == "<\\e>")) {
                                 obj_buff += sl->c;
                             } else {
-                                std::cout << obj_buff << '\n';
+                                //std::cout << obj_buff << '\n';
                                 switch (type) {
                                     case 0:
                                         svec.emplace_back(obj_buff);
