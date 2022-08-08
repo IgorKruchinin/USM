@@ -4,11 +4,8 @@
 
 #ifndef USM_SECTION_H
 #define USM_SECTION_H
-#include "Object.h"
 #include <vector>
 #include <string>
-
-
 
 class IntSection {
     std::string name_;

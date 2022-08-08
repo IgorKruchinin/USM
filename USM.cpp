@@ -1,7 +1,7 @@
 //
 // Created by smurf on 19.07.22.
 //
-// Universal Storage Manager version 0.1
+// Universal Storage Manager
 #include <fstream>
 #include <string>
 #include <map>
@@ -10,31 +10,26 @@
 #include "macro_config.h"
 #include "config.h"
 
-#include "Object.h"
+#include "USM.h"
 #include "Section.h"
 
 #include <iostream>
 
-#define USMVer() USM_VERSION
-
-struct Stringlist {
-    char c;
-    Stringlist* next;
-    Stringlist (const char cc) {
+Stringlist::Stringlist (const char cc) {
         c = cc;
         next = NULL;
-    }
-    void operator= (const char cc) {
-        c = cc;
-    }
-    void add (const char cc) {
+}
+void Stringlist::operator= (const char cc) {
+    c = cc;
+}
+void Stringlist::add (const char cc) {
         Stringlist *sl = this;
         while (sl->next) {
             sl = sl->next;
         }
         sl->next = new Stringlist(cc);
     }
-    const std::string to_string(size_t beg, size_t end) {
+const std::string Stringlist::to_string(size_t beg, size_t end) {
         std::string str;
         Stringlist *sl = this;
         size_t counter = 0;
@@ -47,47 +42,41 @@ struct Stringlist {
         }
         return str;
     }
-    Stringlist* end() {
+Stringlist* Stringlist::end() {
         Stringlist* sl = this;
         while(sl->next) {
             sl = sl->next;
         }
         return sl;
     }
-    bool operator== (const char cc) {
-        return c == cc;
-    }
-    bool operator== (const std::string& str) {
-        Stringlist* sl = this;
-        bool flag = true;
-        //std::cout << str.size();
-        for (int i = 0; i < str.size(); ++i) {
-            //std::cout << i;
-            if (*sl == str[i]) {
-                if (sl->next == NULL) {
-                    std::cout << "String index out of range";
-                    return 0;
-                }
-            } else {
-                flag = false;
-                //return 0;
+bool Stringlist::operator== (const char cc) {
+    return c == cc;
+}
+bool Stringlist::operator== (const std::string& str) {
+    Stringlist* sl = this;
+    bool flag = true;
+    //std::cout << str.size();
+    for (int i = 0; i < str.size(); ++i) {
+        //std::cout << i;
+        if (*sl == str[i]) {
+            if (sl->next == NULL) {
+                std::cout << "String index out of range";
+                return 0;
             }
-            sl = sl->next;
+        } else {
+            flag = false;
+            //return 0;
         }
-        return flag;
+        sl = sl->next;
     }
-};
+    return flag;
+}
 
-class ProfileStorage {
-    std::string name_;
-    std::map<std::string, IntSection> isecs_;
-    std::map<std::string, StringSection> ssecs_;
-    //std::string text_buf_;
-public:
-    ProfileStorage(const std::string &name)
-        : name_(name) {
-        //file_.open("profiles/" + name_, std::fstream::in | std::fstream::out | std::fstream::app);
-        system((std::string(MAKEDIR) + " profiles/res/" + name_).c_str());
+ProfileStorage::ProfileStorage(const std::string &name)
+    : name_(name) {
+    //file_.open("profiles/" + name_, std::fstream::in | std::fstream::out | std::fstream::app);
+    system((std::string(MAKEDIR) + " profiles/res/" + name_).c_str());
+    if (USM_CONFIG::InTextMode) {
         std::ifstream file("profiles/" + name_ + ".uto");
         std::string buf;
         //std::cout << file.is_open();
@@ -112,7 +101,7 @@ public:
                 short four_counter = 0;
                 bool first_after_init_flag = true;
                 Stringlist strlst('1');
-                Stringlist* sl = &strlst;
+                Stringlist *sl = &strlst;
                 for (const auto &s: buf) {
                     //std::cout << s;
                     if (first_in && s == 'i') {
@@ -179,48 +168,50 @@ public:
                 //file_.seekg(0);
             }
         } else {
-            throw "Cannot open file";
+            system((std::string(CREATE_FILE) + name_ + ".uto").c_str());
+            //throw "Cannot open file";
         }
     }
+}
 
 
-    void to_file() {
-        if (USM_CONFIG::InTextMode) {
-            std::string text_buf;
-            for (auto &s: isecs_) {
-                text_buf += "i<" + s.first + ">";
-                for (auto &obj: s.second.get_objects()) {
-                    text_buf += std::to_string(obj) + "|<\\e>";
-                }
-                text_buf += "\n";
+void ProfileStorage::to_file() {
+    if (USM_CONFIG::InTextMode) {
+        std::string text_buf;
+        for (auto &s: isecs_) {
+            text_buf += "i<" + s.first + ">";
+            for (auto &obj: s.second.get_objects()) {
+                text_buf += std::to_string(obj) + "|<\\e>";
             }
-            for (auto &s: ssecs_) {
-                text_buf += "s<" + s.first + ">";
-                for (auto &obj: s.second.get_objects()) {
-                    text_buf += obj + "|<\\e>";
-                }
-            }
-            std::ofstream file("profiles/" + name_ + ".uto");
-            file << text_buf;
+            text_buf += "\n";
         }
+        for (auto &s: ssecs_) {
+            text_buf += "s<" + s.first + ">";
+            for (auto &obj: s.second.get_objects()) {
+                text_buf += obj + "|<\\e>";
+            }
+            text_buf += "\n";
+        }
+        std::ofstream file("profiles/" + name_ + ".uto");
+        file << text_buf;
     }
+}
 
-    IntSection &geti (const std::string& name) {
-        return isecs_.at(name);
-    }
+IntSection& ProfileStorage::geti (const std::string& name) {
+    return isecs_.at(name);
+}
 
-    StringSection &gets (const std::string& name) {
-        return ssecs_.at(name);
-    }
+StringSection& ProfileStorage::gets (const std::string& name) {
+    return ssecs_.at(name);
+}
 
 
-    void create_isec(const std::string &sec_name) {
-        isecs_.emplace(sec_name, IntSection(sec_name));
-    }
+void ProfileStorage::create_isec(const std::string &sec_name) {
+    isecs_.emplace(sec_name, IntSection(sec_name));
+}
 
-    void create_ssec(const std::string &sec_name) {
+void ProfileStorage::create_ssec(const std::string &sec_name) {
         ssecs_.emplace(sec_name, StringSection(sec_name));
-    }
-};
+}
 
 
