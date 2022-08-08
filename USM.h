@@ -31,6 +31,7 @@ class ProfileStorage {
     std::map<std::string, IntSection> isecs_;
     std::map<std::string, StringSection> ssecs_;
     //std::string text_buf_;
+    bool is_opened;
 public:
     ProfileStorage(const std::string &name);
 
@@ -41,6 +42,7 @@ public:
     StringSection &gets (const std::string& name);
     void create_isec(const std::string &sec_name);
     void create_ssec(const std::string &sec_name);
+    const bool opened();
 };
 
 #endif //USM_USM_H

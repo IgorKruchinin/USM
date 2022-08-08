@@ -80,7 +80,8 @@ ProfileStorage::ProfileStorage(const std::string &name)
         std::ifstream file("profiles/" + name_ + ".uto");
         std::string buf;
         //std::cout << file.is_open();
-        if (file.is_open()) {
+        is_opened = file.is_open();
+        if (is_opened) {
             //std::cout << '1';
             while (std::getline(file, buf)) {
                 //std::cout << buf << '|';
@@ -214,4 +215,6 @@ void ProfileStorage::create_ssec(const std::string &sec_name) {
         ssecs_.emplace(sec_name, StringSection(sec_name));
 }
 
-
+const bool ProfileStorage::opened() {
+    return is_opened;
+}
