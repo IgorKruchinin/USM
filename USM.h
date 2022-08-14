@@ -12,7 +12,10 @@
 
 #include "Section.h"
 
+static const char * BuildDate = __DATE__;
+
 #define USMVer() USM_VERSION
+#define Built() BuildDate
 
 struct Stringlist {
     char c;

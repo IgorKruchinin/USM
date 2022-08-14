@@ -16,39 +16,39 @@
 #include <iostream>
 
 Stringlist::Stringlist (const char cc) {
-        c = cc;
-        next = NULL;
+    c = cc;
+    next = NULL;
 }
 void Stringlist::operator= (const char cc) {
     c = cc;
 }
 void Stringlist::add (const char cc) {
-        Stringlist *sl = this;
-        while (sl->next) {
-            sl = sl->next;
-        }
-        sl->next = new Stringlist(cc);
+    Stringlist *sl = this;
+    while (sl->next) {
+        sl = sl->next;
     }
+    sl->next = new Stringlist(cc);
+}
 const std::string Stringlist::to_string(size_t beg, size_t end) {
-        std::string str;
-        Stringlist *sl = this;
-        size_t counter = 0;
-        while(sl && counter < end) {
-            if (counter >= beg) {
-                str += sl->c;
-            }
-            sl = sl->next;
-            ++counter;
+    std::string str;
+    Stringlist *sl = this;
+    size_t counter = 0;
+    while(sl && counter < end) {
+        if (counter >= beg) {
+            str += sl->c;
         }
-        return str;
+        sl = sl->next;
+        ++counter;
     }
+    return str;
+}
 Stringlist* Stringlist::end() {
-        Stringlist* sl = this;
-        while(sl->next) {
-            sl = sl->next;
-        }
-        return sl;
+    Stringlist* sl = this;
+    while(sl->next) {
+        sl = sl->next;
     }
+    return sl;
+}
 bool Stringlist::operator== (const char cc) {
     return c == cc;
 }
@@ -73,7 +73,7 @@ bool Stringlist::operator== (const std::string& str) {
 }
 
 ProfileStorage::ProfileStorage(const std::string &name)
-    : name_(name) {
+        : name_(name) {
     //file_.open("profiles/" + name_, std::fstream::in | std::fstream::out | std::fstream::app);
     system((std::string(MAKEDIR) + " profiles/res/" + name_).c_str());
     if (USM_CONFIG::InTextMode) {
@@ -170,6 +170,9 @@ ProfileStorage::ProfileStorage(const std::string &name)
             }
         } else {
             system((std::string(CREATE_FILE) + name_ + ".uto").c_str());
+            std::ofstream profiles_list("profiles/profiles_list.txt", std::ios::app);
+            profiles_list << name;
+            profiles_list << '\n';
             //throw "Cannot open file";
         }
     }
@@ -212,7 +215,7 @@ void ProfileStorage::create_isec(const std::string &sec_name) {
 }
 
 void ProfileStorage::create_ssec(const std::string &sec_name) {
-        ssecs_.emplace(sec_name, StringSection(sec_name));
+    ssecs_.emplace(sec_name, StringSection(sec_name));
 }
 
 const bool ProfileStorage::opened() {

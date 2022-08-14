@@ -7,7 +7,6 @@
 
 struct USM_CONFIG {
     static bool InTextMode;
-
 };
 
 #endif //USM_CONFIG_H
