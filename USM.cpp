@@ -169,7 +169,7 @@ ProfileStorage::ProfileStorage(const std::string &name)
                 //file_.seekg(0);
             }
         } else {
-            system((std::string(CREATE_FILE) + name_ + ".uto").c_str());
+            system((std::string(CREATE_FILE) + "profiles/" + name_ + ".uto").c_str());
             std::ofstream profiles_list("profiles/profiles_list.txt", std::ios::app);
             profiles_list << name;
             profiles_list << '\n';
