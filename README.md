@@ -17,6 +17,7 @@ Coding "Hello" and "It's wonderful" string values
 API Description:
 
 Include "USM/USM.h" and define a Profile Storage object as first:
+
 ProfileStorage ps("NameOfYourProfileStorage");
 
 ps.create_ssec("StringSectionName"); // Creates a string section
@@ -43,4 +44,5 @@ Compilation:
 Compiles with linking with USM.cpp and Section.cpp files
 
 Warning!
+
 Add "bool USM_CONFIG::InTextMode = 1;" in your main cpp file in global space
