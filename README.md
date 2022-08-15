@@ -7,12 +7,12 @@ USM is Universal Storage Manager for creating profiles. It's writes data in .uto
 
 Example of .uto file:
 
-i<sectionname>146|<\e>587|<\e>
+i&ltsectionname&gt146|<\e>587|<\e>
 
 Coding 146 and 587 int values
 
-"i" before <sectionname> is a format specifier. The "i" mean integer, also possible the "s" format specifier (means string). Next comes the name of section. Next comes int or string values, each of them ends as |<\e>
-s<sectionname>Hello|<\e>It's wonderful|<\e>
+"i" before &ltsectionname&gt is a format specifier. The "i" mean integer, also possible the "s" format specifier (means string). Next comes the name of section. Next comes int or string values, each of them ends as |<\e>
+s&ltsectionname&gtHello|<\e>It's wonderful|<\e>
 
 Coding "Hello" and "It's wonderful" string values
 API Description:
