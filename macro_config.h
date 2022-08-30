@@ -9,6 +9,7 @@
 
 #if defined(__unix__) || defined(__unix) || defined(unix) // if OS is UNIX-Like
 
+#define SEPARATOR "/"
 #define MAKEDIR "mkdir -p "
 #define CREATE_FILE "touch "
 

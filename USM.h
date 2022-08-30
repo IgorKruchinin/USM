@@ -37,8 +37,8 @@ class ProfileStorage {
     bool is_opened;
 public:
     ProfileStorage(const std::string &name);
-
-
+    std::vector<ProfileStorage> static get_profiles(const std::string& program_name);
+    const std::string& get_name();
     void to_file();
 
     IntSection &geti (const std::string& name);

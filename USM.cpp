@@ -14,6 +14,26 @@
 #include "Section.h"
 
 #include <iostream>
+bool InTextMode = 1;
+
+const std::vector<std::string> split(const std::string& str, char delim) {
+    std::vector<std::string> result;
+    std::string buf;
+    buf.clear();
+    result.clear();
+    int i = 0;
+    for (const auto& c: str) {
+        if (c == delim) {
+            result.emplace_back(buf);
+            buf.clear();
+        } else {
+            buf += c;
+        }
+    }
+    result.emplace_back(buf);
+    buf.clear();
+    return result;
+}
 
 Stringlist::Stringlist (const char cc) {
     c = cc;
@@ -76,7 +96,7 @@ ProfileStorage::ProfileStorage(const std::string &name)
         : name_(name) {
     //file_.open("profiles/" + name_, std::fstream::in | std::fstream::out | std::fstream::app);
     system((std::string(MAKEDIR) + " profiles/res/" + name_).c_str());
-    if (USM_CONFIG::InTextMode) {
+    if (InTextMode) {
         std::ifstream file("profiles/" + name_ + ".uto");
         std::string buf;
         //std::cout << file.is_open();
@@ -178,9 +198,12 @@ ProfileStorage::ProfileStorage(const std::string &name)
     }
 }
 
+const std::string& ProfileStorage::get_name() {
+    return name_;
+}
 
 void ProfileStorage::to_file() {
-    if (USM_CONFIG::InTextMode) {
+    if (InTextMode) {
         std::string text_buf;
         for (auto &s: isecs_) {
             text_buf += "i<" + s.first + ">";
@@ -199,6 +222,26 @@ void ProfileStorage::to_file() {
         std::ofstream file("profiles/" + name_ + ".uto");
         file << text_buf;
     }
+}
+
+std::vector<ProfileStorage> ProfileStorage::get_profiles(const std::string& program_name) {
+    std::vector<ProfileStorage> profiles;
+    std::string path("profiles" + std::string(SEPARATOR) + "profiles_list.txt");
+    std::ifstream file(path);
+    if (file) {
+        std::string buf;
+        while (std::getline(file, buf)) {
+            std::vector<std::string> s1 = split(buf, ':');
+            if (s1.size() > 0) {
+                if (s1.size() == 1 || s1[1] == program_name) {
+                    profiles.emplace_back(s1[0]);
+                }
+            }
+        }
+    } else {
+        system((std::string(CREATE_FILE) + path).c_str());
+    }
+    return profiles;
 }
 
 IntSection& ProfileStorage::geti (const std::string& name) {
